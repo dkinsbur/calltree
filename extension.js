@@ -1,5 +1,8 @@
 const vscode = require('vscode');
 const util = require('util');
+var path = require('path');
+const { setSyntheticLeadingComments } = require('typescript');
+
 const exec = util.promisify(require('child_process').exec);
 
 function sleep(ms) {
@@ -8,7 +11,7 @@ function sleep(ms) {
 
 async function build() {
 	vscode.window.showInformationMessage('Started Building');
-//   const { stdout, stderr } = await exec('ssh dkinsb@dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -Rb"', {cwd: vscode.workspace.rootPath});
+  	// const { stdout, stderr } = await exec('ssh dkinsb@dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -Rb"', {cwd: vscode.workspace.rootPath});
 	const { stdout, stderr } = await exec('cscope -Rb', {cwd: vscode.workspace.rootPath});
 	vscode.window.showInformationMessage('Done Building');
 }
@@ -37,16 +40,39 @@ function parseCallers(output) {
 
 async function getCallers(symbol) {
 	console.log('symbol',symbol);
-	// const { stdout, stderr } = await exec(`ssh  dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -d -fcscope.out -L3 ${symbol}"`, {cwd: vscode.workspace.rootPath, timeout: 5000});
+	// const { stdout, stderr } = await exec(`ssh  dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -d -fcscope.out -L3 ${symbol}"`, {cwd: vscode.workspace.rootPath, timeout: 7000});
 	const { stdout, stderr } = await exec(`cscope -d -fcscope.out -L3 ${symbol}`, {cwd: vscode.workspace.rootPath, timeout: 7000});
 	return parseCallers(stdout);
 }
 
+function goto(node) {
+	let fname = node.fname;
+	const line = node.line;
+	if (!fname.includes(vscode.workspace.rootPath)) {
+		fname = path.join(vscode.workspace.rootPath, node.fname);
+	}
+	
+	console.log(node);
+	
+	vscode.workspace.openTextDocument(fname).then(doc => {
+        vscode.window.showTextDocument(doc).then(() => {
+            if (vscode.window.activeTextEditor == null) {
+                return;
+			}
+            vscode.window.activeTextEditor.selection = new vscode.Selection(line - 1, 0, line - 1, 0);;
+            vscode.window.activeTextEditor.revealRange(vscode.window.activeTextEditor.selection, 
+					vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+        });
+    });
+}
 
 class TreeViewItem extends vscode.TreeItem {
-    constructor(label, desc) {
+    constructor(label, desc, fname, line) {
         super(label, vscode.TreeItemCollapsibleState.Collapsed);
 		this.description = desc;
+		this.fname = fname;
+		this.line = parseInt(line);
+		this.command = {command: 'calltree.gotod', arguments: [this]};
     }
 }
 
@@ -69,7 +95,7 @@ class NodeDependenciesProvider {
 
 	getTreeItem(element) {
 		console.log('getTreeItem', element);
-        return new TreeViewItem(`${element[1]}():  ${element[3]}`, `${element[0]}:${element[2]}`);
+        return new TreeViewItem(`${element[1]}():  ${element[3]}`, `${element[0]}:${element[2]}`, element[0], element[2]);
     }
   
 	getChildren(element) {
@@ -112,8 +138,10 @@ function activate(context) {
 			console.log();
 			gTree.add([file, symbol ,line, '']);
 		});
-		
+	
 	}));
+	context.subscriptions.push(vscode.commands.registerCommand('calltree.gotod', goto));
+
 }
 
 // this method is called when your extension is deactivated

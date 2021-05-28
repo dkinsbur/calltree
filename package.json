@@ -3,7 +3,7 @@
 	"publisher": "daniel",
 	"displayName": "CallTree",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -11,7 +11,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:calltree.build", "onCommand:calltree.find"
+		"onCommand:calltree.build", "onCommand:calltree.find", "onCommand:calltree.gotod"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -23,8 +23,14 @@
 			{
 				"command": "calltree.find",
 				"title": "CallTree: Find"
+			},
+			{
+				"command": "calltree.gotod",
+				"title": "CallTree: Goto"
 			}
 		],
+		
+		
 		"views": {
 			"explorer": [
 				{
