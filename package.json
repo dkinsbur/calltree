@@ -29,7 +29,13 @@
 				"title": "CallTree: Goto"
 			}
 		],
-		
+		"menus": {
+			"editor/context": [
+				{
+					"command": "calltree.find"
+				}
+			]
+		},
 		
 		"views": {
 			"explorer": [
