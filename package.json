@@ -11,7 +11,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:calltree.build", "onCommand:calltree.find", "onCommand:calltree.gotod"
+		"onCommand:calltree.build", "onCommand:calltree.find", "onCommand:calltree.goto"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -25,7 +25,7 @@
 				"title": "CallTree: Find"
 			},
 			{
-				"command": "calltree.gotod",
+				"command": "calltree.goto",
 				"title": "CallTree: Goto"
 			}
 		],

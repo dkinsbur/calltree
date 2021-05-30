@@ -1,7 +1,6 @@
 const vscode = require('vscode');
 const util = require('util');
 var path = require('path');
-// const { setSyntheticLeadingComments } = require('typescript');
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -67,9 +66,16 @@ function goto(node) {
 }
 
 class TreeViewItem extends vscode.TreeItem {
-    constructor(label, desc) {
+    constructor(label, desc, fname, line) {
         super(label, vscode.TreeItemCollapsibleState.Collapsed);
 		this.description = desc;
+		this.fname = fname;
+		this.line = parseInt(line);
+		this.command = {
+			command: 'calltree.goto',
+			arguments: [this],
+			title: 'goto source'
+		};
     }
 }
 
@@ -92,7 +98,7 @@ class NodeDependenciesProvider {
 
 	getTreeItem(element) {
 		console.log('getTreeItem', element);
-        return new TreeViewItem(`${element[1]}():  ${element[3]}`, `${element[0]}:${element[2]}`);
+        return new TreeViewItem(`${element[1]}():  ${element[3]}`, `${element[0]}:${element[2]}`, element[0], element[2]);
     }
   
 	getChildren(element) {
@@ -137,7 +143,7 @@ function activate(context) {
 		});
 	
 	}));
-	context.subscriptions.push(vscode.commands.registerCommand('calltree.gotod', goto));
+	context.subscriptions.push(vscode.commands.registerCommand('calltree.goto', node => goto(node) ));
 
 }
 
