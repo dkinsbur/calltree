@@ -40,7 +40,7 @@ function parseCallers(output) {
 async function getCallers(symbol) {
 	console.log('symbol',symbol);
 	// const { stdout, stderr } = await exec(`ssh  dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -d -fcscope.out -L3 ${symbol}"`, {cwd: vscode.workspace.rootPath, timeout: 7000});
-	const { stdout, stderr } = await exec(`cscope -d -fcscope.out -L3 ${symbol}`, {cwd: vscode.workspace.rootPath, timeout: 7000});
+	const { stdout, stderr } = await exec(`cscope -d -fcscope.out -L0 ${symbol}`, {cwd: vscode.workspace.rootPath, timeout: 7000});
 	return parseCallers(stdout);
 }
 
@@ -98,7 +98,7 @@ class NodeDependenciesProvider {
 
 	getTreeItem(element) {
 		console.log('getTreeItem', element);
-        return new TreeViewItem(`${element[1]}():  ${element[3]}`, `${element[0]}:${element[2]}`, element[0], element[2]);
+        return new TreeViewItem(`${element[1]}:  ${element[3]}`, `${element[0]}:${element[2]}`, element[0], element[2]);
     }
   
 	getChildren(element) {
@@ -107,6 +107,9 @@ class NodeDependenciesProvider {
 			return this.paths;
 		}
 		else {
+			if (element[1] == '<global>') {
+				return [];
+			} 
 			return getCallers(element[1]);
 		}
 		
