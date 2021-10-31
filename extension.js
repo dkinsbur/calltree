@@ -2,6 +2,16 @@ const vscode = require('vscode');
 const util = require('util');
 var path = require('path');
 
+let DEBUG_ON_REMOTE = true
+
+function genCscopeCmd(rawCmd) {
+	if (DEBUG_ON_REMOTE) {
+		return `ssh dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && ${rawCmd}"`;
+	} else {
+		return rawCmd;
+	}
+}
+
 const exec = util.promisify(require('child_process').exec);
 
 function sleep(ms) {
@@ -10,8 +20,9 @@ function sleep(ms) {
 
 async function build() {
 	vscode.window.showInformationMessage('Started Building');
-  	// const { stdout, stderr } = await exec('ssh dkinsb@dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -Rb"', {cwd: vscode.workspace.rootPath});
-	const { stdout, stderr } = await exec('cscope -Rb', {cwd: vscode.workspace.rootPath});
+	let CMD = genCscopeCmd('cscope -Rb');
+	console.log('CMD:', CMD);
+	const { stdout, stderr } = await exec(CMD, {cwd: vscode.workspace.workspaceFolders[0].uri.fsPath});
 	vscode.window.showInformationMessage('Done Building');
 }
 class FuncInfo {
@@ -39,16 +50,18 @@ function parseCallers(output) {
 
 async function getCallers(symbol) {
 	console.log('symbol',symbol);
-	// const { stdout, stderr } = await exec(`ssh  dev-dsk-dkinsb-1b-66d7b3dd.eu-west-1.amazon.com "cd /home/dkinsb/code/perftest && cscope -d -fcscope.out -L3 ${symbol}"`, {cwd: vscode.workspace.rootPath, timeout: 7000});
-	const { stdout, stderr } = await exec(`cscope -d -fcscope.out -L0 ${symbol}`, {cwd: vscode.workspace.rootPath, timeout: 7000});
+	let CMD = genCscopeCmd(`cscope -d -fcscope.out -L0 ${symbol}`);
+	console.log('CMD:', CMD);
+	const { stdout, stderr } = await exec(CMD, {cwd: vscode.workspace.workspaceFolders[0].uri.fsPath, timeout: 7000});
+	console.log("stdout:", stdout)
 	return parseCallers(stdout);
 }
 
 function goto(node) {
 	let fname = node.fname;
 	const line = node.line;
-	if (!fname.includes(vscode.workspace.rootPath)) {
-		fname = path.join(vscode.workspace.rootPath, node.fname);
+	if (!fname.includes(vscode.workspace.workspaceFolders[0].uri.fsPath)) {
+		fname = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, node.fname);
 	}
 	
 	console.log(node);
