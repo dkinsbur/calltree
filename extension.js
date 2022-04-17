@@ -2,7 +2,7 @@ const vscode = require('vscode');
 const util = require('util');
 var path = require('path');
 
-let DEBUG_ON_REMOTE = true
+let DEBUG_ON_REMOTE = false;
 
 function genCscopeCmd(rawCmd) {
 	if (DEBUG_ON_REMOTE) {
