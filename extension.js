@@ -150,6 +150,10 @@ function activate(context) {
 		if (!activeEditor) {
 			return;
 		}
+
+		// bring the dependency view to front
+		vscode.commands.executeCommand("nodeDependencies.focus");
+
 		vscode.commands.executeCommand('editor.action.addSelectionToNextFindMatch').then(() => {
 			let file = activeEditor.document.fileName;
 			let line = activeEditor.selection.anchor.line;
