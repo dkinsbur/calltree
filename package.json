@@ -3,7 +3,7 @@
 	"publisher": "daniel",
 	"displayName": "CallTree",
 	"description": "",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -11,11 +11,37 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:calltree.build", "onCommand:calltree.find", "onCommand:calltree.goto"
+		"onCommand:calltree.build",
+		"onCommand:calltree.find",
+		"onCommand:calltree.gotoSrc",
+		"onCommand:calltree.settings"
+		
 	],
 	"main": "./extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "CallTree",
+			"properties": {
+				"calltree.include": {
+					"order": 0,
+					"type": "string",
+					"default": "",
+					"description": "Files to include"
+				},
+				"calltree.exclude": {
+					"order": 1,
+					"type": "string",
+					"default": "",
+					"description": "Files to exclude"
+				}
+			}
+		},
+		
 		"commands": [
+			{
+				"command": "calltree.settings",
+				"title": "CallTree: Open Settings"
+			},
 			{
 				"command": "calltree.build",
 				"title": "CallTree: Build"
@@ -25,7 +51,7 @@
 				"title": "CallTree: Find"
 			},
 			{
-				"command": "calltree.goto",
+				"command": "calltree.gotoSrc",
 				"title": "CallTree: Goto"
 			}
 		],
@@ -42,7 +68,7 @@
 				{
 					"id": "nodeDependencies",
 					"name": "CallTree",
-					"contextualTitle": "what ever",
+					"contextualTitle": "Call Tree",
 					"visibility": "visible"
 				}
 			]
