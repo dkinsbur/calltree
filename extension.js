@@ -100,11 +100,19 @@ class SearchNode extends Node {
 
 
 class NodeTreeItem extends vscode.TreeItem {
-	constructor (node) {
+	constructor (node, gotoSrcCmd) {
 		super( "", vscode.TreeItemCollapsibleState.Collapsed);
 		this.node = node;
 		this.label = this.getLabel();
 		this.description = this.getDescription();
+
+		if (gotoSrcCmd) {
+			this.command = {
+				command: 'calltree.gotoSrc',
+				arguments: [this.node.fileName, this.node.pos],
+				title: 'goto source'
+			};
+		}
 	}
 
 	getLabel() {
@@ -118,12 +126,7 @@ class NodeTreeItem extends vscode.TreeItem {
 
 class SymbolNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node);
-		this.command = {
-			command: 'calltree.gotoSrc',
-			arguments: [this.node.fileName, this.node.pos],
-			title: 'goto source'
-		};
+        super(node, true);
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "arrow-dark.png"),
 			light: vscode.Uri.joinPath(extensionUri, "resources", "arrow-light.png"),
@@ -149,12 +152,7 @@ class SymbolNodeTreeItem extends NodeTreeItem {
 
 class DeclNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node);
-		this.command = {
-			command: 'calltree.gotoSrc',
-			arguments: [this.node.fileName, this.node.pos],
-			title: 'goto source'
-		};
+        super(node, true);
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "h-dark.png"),
 			light: vscode.Uri.joinPath(extensionUri, "resources", "h-light.png"),
@@ -173,12 +171,7 @@ class DeclNodeTreeItem extends NodeTreeItem {
 }
 class DefNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node);
-		this.command = {
-			command: 'calltree.gotoSrc',
-			arguments: [this.node.fileName, this.node.pos],
-			title: 'goto source'
-		};
+        super(node, true);
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "c-dark.png"),
 			light: vscode.Uri.joinPath(extensionUri, "resources", "c-light.png"),
@@ -197,7 +190,7 @@ class DefNodeTreeItem extends NodeTreeItem {
 
 class FileNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node);
+        super(node, false);
 	this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
     }
 	getLabel() {
@@ -211,7 +204,7 @@ class FileNodeTreeItem extends NodeTreeItem {
 
 class SearchNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node);
+        super(node, false);
 	this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "search-dark.png"),
