@@ -100,8 +100,8 @@ class SearchNode extends Node {
 
 
 class NodeTreeItem extends vscode.TreeItem {
-	constructor (node, collapse=vscode.TreeItemCollapsibleState.Collapsed) {
-		super( "", collapse);
+	constructor (node) {
+		super( "", vscode.TreeItemCollapsibleState.Collapsed);
 		this.node = node;
 		this.label = this.getLabel();
 		this.description = this.getDescription();
@@ -197,7 +197,8 @@ class DefNodeTreeItem extends NodeTreeItem {
 
 class FileNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node, vscode.TreeItemCollapsibleState.Expanded);
+        super(node);
+	this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
     }
 	getLabel() {
 		return path.parse(this.node.fileName).base;
@@ -210,7 +211,8 @@ class FileNodeTreeItem extends NodeTreeItem {
 
 class SearchNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node, vscode.TreeItemCollapsibleState.Expanded);
+        super(node);
+	this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "search-dark.png"),
 			light: vscode.Uri.joinPath(extensionUri, "resources", "search-light.png"),
