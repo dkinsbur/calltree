@@ -88,9 +88,11 @@ class FileNode extends Node {
 	}
    
 class SearchNode extends Node {
-	constructor(symbol) {
+	constructor(symbol, fileName, pos) {
 		super();
 		this.symbol = symbol;
+		this.fileName = fileName;
+		this.pos = pos;
 	}
 	getChildren() {
 		return getCallers(this.symbol);
@@ -204,7 +206,7 @@ class FileNodeTreeItem extends NodeTreeItem {
 
 class SearchNodeTreeItem extends NodeTreeItem {
     constructor(node) {
-        super(node, false);
+        super(node, true);
 	this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		this.iconPath = {
 			dark: vscode.Uri.joinPath(extensionUri, "resources", "search-dark.png"),
@@ -216,7 +218,7 @@ class SearchNodeTreeItem extends NodeTreeItem {
 	}
 	
 	getDescription() {
-		return '';
+		return `${this.node.fileName} : ${this.node.pos}`;
 	}
 }
 
@@ -387,10 +389,10 @@ function activate(context) {
 		vscode.commands.executeCommand("nodeDependencies.focus");
 
 		vscode.commands.executeCommand('editor.action.addSelectionToNextFindMatch').then(() => {
-			// let file = activeEditor.document.fileName;
-			// let line = activeEditor.selection.anchor.line + 1;
+			let file = activeEditor.document.fileName;
+			let line = activeEditor.selection.anchor.line + 1;
 			let symbol = activeEditor.document.getText(activeEditor.selection).trim();
-			gTree.set(new SearchNode(symbol));
+			gTree.set(new SearchNode(symbol, vscode.workspace.asRelativePath(file), line));
 		});
 	
 	}));
