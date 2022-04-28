@@ -58,6 +58,9 @@
 		"menus": {
 			"editor/context": [
 				{
+					"command": "calltree.build"
+				},
+				{
 					"command": "calltree.find"
 				}
 			]
