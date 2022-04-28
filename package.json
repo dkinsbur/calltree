@@ -92,5 +92,9 @@
 		"mocha": "^8.2.1",
 		"typescript": "^4.1.3",
 		"vscode-test": "^1.5.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/dkinsbur/calltree.git"
 	}
 }
